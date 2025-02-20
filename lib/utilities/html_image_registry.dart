@@ -10,7 +10,7 @@ void registerImageElement() {
         ..id = 'customImage'
         ..style.width = '100%'
         ..style.height = '100%'
-        ..style.objectFit = 'contain'
+        ..style.objectFit = 'fill'
         ..style.display = 'block'
         ..style.margin = 'auto';
       return image;

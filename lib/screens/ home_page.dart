@@ -3,7 +3,6 @@ import 'package:image_resolution/servies/fullscreen_service.dart';
 import '../widgets/url_input_field.dart';
 import '../widgets/image_viewer.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -41,7 +40,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       imageUrl = _urlController.text;
     });
 
-    await Future.delayed(const Duration(milliseconds: 500)); 
+    await Future.delayed(const Duration(milliseconds: 500));
 
     setState(() {
       isLoading = false;
@@ -52,10 +51,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (isMenuOpen) setState(() => isMenuOpen = false);
+        if (isMenuOpen) {
+          setState(() => isMenuOpen = false);
+          _animationController.reverse();
+        }
       },
       child: Scaffold(
-        backgroundColor: isMenuOpen ? Colors.black.withOpacity(0.4) : Colors.grey[50],
+        backgroundColor: Colors.grey[50],
         appBar: AppBar(
           title: const Text('Image Fullscreen Web App'),
           centerTitle: true,
@@ -90,10 +92,29 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            ImageViewer(
-                              imageUrl: imageUrl,
-                              onDoubleTap: FullscreenService.toggleFullscreen,
-                            ),
+                            imageUrl.isEmpty
+                                ? Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Container(
+                                      color: Colors.black12,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      child: const Center(
+                                        child: Text(
+                                          'No Image Loaded',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black54,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                )
+                                : ImageViewer(
+                                    imageUrl: imageUrl,
+                                    onDoubleTap: FullscreenService.toggleFullscreen,
+                                  ),
                             if (isLoading)
                               const CircularProgressIndicator(
                                 color: Colors.deepPurpleAccent,
@@ -106,6 +127,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
               ],
             ),
+            if (isMenuOpen)
+              GestureDetector(
+                onTap: () {
+                  setState(() => isMenuOpen = false);
+                  _animationController.reverse();
+                },
+                child: AnimatedOpacity(
+                  opacity: 0.4,
+                  duration: const Duration(milliseconds: 300),
+                  child: Container(
+                    color: Colors.black,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+              ),
             Positioned(
               bottom: 30,
               right: 30,
@@ -129,7 +166,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       setState(() => isMenuOpen = !isMenuOpen);
                       isMenuOpen ? _animationController.forward() : _animationController.reverse();
                     },
-                    child: Icon(isMenuOpen ? Icons.close : Icons.more_vert),
+                    child: Icon(isMenuOpen ? Icons.close : Icons.add),
                   ),
                 ],
               ),
@@ -140,7 +177,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  
   Widget _buildMenuButton(String label, VoidCallback onPressed) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
